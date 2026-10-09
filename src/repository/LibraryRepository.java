@@ -1,10 +1,67 @@
 package repository;
 
-import model.Book;
-import model.MemberRecord;
-import model.Category;
+import model.*;
+
+import java.util.*;
 
 
 
 public class LibraryRepository {
+    private Map<String, Book> books = new HashMap<>();
+    private Map<String, MemberRecord> members = new HashMap<>();
+    private Set<Category> categories = new HashSet<>();
+    private List<Bill> bills = new ArrayList<>();
+
+
+    //burası kitap işlemleri için
+    public void addBook(Book book) {
+        books.put(book.getId(), book);
+        if(book.getCategory() != null) {
+            categories.add(book.getCategory());
+        }
+    }
+
+    public void removeBook(String bookId) {
+        books.remove(bookId);
+    }
+
+    public Book getBookById(String bookId) {
+        return books.get(bookId);
+    }
+
+    public Collection<Book> getAllBooks() {
+        return books.values();
+    }
+
+    //burası üye işlemleri için
+
+    public void addMember(MemberRecord member) {
+        members.put(member.getMemberId(), member);
+    }
+
+    public MemberRecord getMemberById(String memberId) {
+        return members.get(memberId);
+    }
+
+    public Collection<MemberRecord> getAllMembers() {
+        return members.values();
+    }
+
+
+    //burası fatura işlemleri için
+
+    public void addBill(Bill bill) {
+        bills.add(bill);
+    }
+
+    public List<Bill> getAllBills() {
+        return bills;
+    }
+
+
+    //burası kategori işlemleri için
+
+    public Set<Category> getCategories() {
+        return categories;
+    }
 }
