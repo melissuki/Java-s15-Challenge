@@ -15,7 +15,7 @@ public class LibraryRepository {
 
     //burası kitap işlemleri için
     public void addBook(Book book) {
-        books.put(book.getId(), book);
+        books.put(book.getBookId(), book);
         if(book.getCategory() != null) {
             categories.add(book.getCategory());
         }

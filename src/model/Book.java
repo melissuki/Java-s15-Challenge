@@ -47,6 +47,14 @@ public abstract class Book {
         this.status = status;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
+    }
+
     public void display() {
         System.out.println("Kitap: " + name + " | Yazar: " + author.getName() + " | Fiyat: " + price + " TL");
     }
