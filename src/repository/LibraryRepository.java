@@ -9,6 +9,7 @@ import java.util.*;
 public class LibraryRepository {
     private Map<String, Book> books = new HashMap<>();
     private Map<String, MemberRecord> members = new HashMap<>();
+    private Map<String, String> borrowedBooks = new HashMap<>(); // kitapId -> üyeId
     private Set<Category> categories = new HashSet<>();
     private List<Bill> bills = new ArrayList<>();
 
@@ -30,7 +31,7 @@ public class LibraryRepository {
     }
 
     public Collection<Book> getAllBooks() {
-        return books.values();
+        return Collections.unmodifiableCollection(books.values());
     }
 
     //burası üye işlemleri için
@@ -44,7 +45,26 @@ public class LibraryRepository {
     }
 
     public Collection<MemberRecord> getAllMembers() {
-        return members.values();
+        return Collections.unmodifiableCollection(members.values());
+    }
+
+
+    //burası ödünç işlemleri için
+
+    public void addBorrowRecord(String bookId, String memberId) {
+        borrowedBooks.put(bookId, memberId);
+    }
+
+    public void removeBorrowRecord(String bookId) {
+        borrowedBooks.remove(bookId);
+    }
+
+    public String getBorrowerId(String bookId) {
+        return borrowedBooks.get(bookId);
+    }
+
+    public Map<String, String> getBorrowedBooks() {
+        return Collections.unmodifiableMap(borrowedBooks);
     }
 
 
@@ -55,13 +75,13 @@ public class LibraryRepository {
     }
 
     public List<Bill> getAllBills() {
-        return bills;
+        return Collections.unmodifiableList(bills);
     }
 
 
     //burası kategori işlemleri için
 
     public Set<Category> getCategories() {
-        return categories;
+        return Collections.unmodifiableSet(categories);
     }
 }

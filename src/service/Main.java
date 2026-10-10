@@ -19,10 +19,12 @@ public class Main {
         Book book2 = new StudyBooks("B2", "Revenge", author2, cat1, 120.0, 1);
 
         MemberRecord member = new Student("M1", "Melis");
+        MemberRecord member2 = new Faculty("M2", "Ayşe");
 
         repository.addBook(book1);
         repository.addBook(book2);
         repository.addMember(member);
+        repository.addMember(member2);
 
         boolean running = true;
         while (running) {
@@ -34,6 +36,10 @@ public class Main {
             System.out.println("5. Yazara Göre Kitapları Listele");
             System.out.println("6. Kitap Ödünç Al");
             System.out.println("7. Kitap İade Et");
+            System.out.println("8. Kategoriye Göre Kitapları Listele");
+            System.out.println("9. Ödünçteki Kitaplar (Kimde?)");
+            System.out.println("10. Üyeleri Listele");
+            System.out.println("11. Yeni Üye Ekle");
             System.out.println("0. Çıkış");
             System.out.print("Seçiminiz: ");
 
@@ -55,12 +61,22 @@ public class Main {
                     String bName = scanner.nextLine();
                     System.out.print("Yazar Adı: ");
                     String aName = scanner.nextLine();
-                    System.out.print("Fiyat: ");
-                    double price = Double.parseDouble(scanner.nextLine());
+                    System.out.print("Kategori Adı: ");
+                    String cName = scanner.nextLine();
+                    double price = readDouble(scanner, "Fiyat: ");
+                    System.out.print("Tür (1: Ders Kitabı, 2: Dergi, 3: Magazin): ");
+                    String type = scanner.nextLine();
 
                     Author newAuthor = new Author("A-" + UUID.randomUUID().toString().substring(0,4), aName);
-                    Category newCat = new Category("C-Genel", "Genel");
-                    Book newBook = new StudyBooks(bId, bName, newAuthor, newCat, price, 1);
+                    Category category = service.findOrCreateCategory(cName);
+                    Book newBook;
+                    if (type.equals("2")) {
+                        newBook = new Journals(bId, bName, newAuthor, category, price, 1);
+                    } else if (type.equals("3")) {
+                        newBook = new Magazines(bId, bName, newAuthor, category, price, 1);
+                    } else {
+                        newBook = new StudyBooks(bId, bName, newAuthor, category, price, 1);
+                    }
                     service.addBook(newBook);
                     break;
                 case 2:
@@ -73,8 +89,7 @@ public class Main {
                     String uId = scanner.nextLine();
                     System.out.print("Yeni Kitap Adı: ");
                     String uName = scanner.nextLine();
-                    System.out.print("Yeni Fiyat: ");
-                    double uPrice = Double.parseDouble(scanner.nextLine());
+                    double uPrice = readDouble(scanner, "Yeni Fiyat: ");
                     service.updateBook(uId, uName, uPrice);
                     break;
                 case 4:
@@ -101,6 +116,34 @@ public class Main {
                     String bIdReturn = scanner.nextLine();
                     service.returnBook(mIdReturn, bIdReturn);
                     break;
+                case 8:
+                    service.listCategories();
+                    System.out.print("Kategori Adı (Örn: Roman): ");
+                    String categoryName = scanner.nextLine();
+                    service.listBooksByCategory(categoryName);
+                    break;
+                case 9:
+                    service.listBorrowedBooks();
+                    break;
+                case 10:
+                    service.listMembers();
+                    break;
+                case 11:
+                    System.out.print("Üye ID (Örn: M3): ");
+                    String newMemberId = scanner.nextLine();
+                    System.out.print("Üye Adı: ");
+                    String newMemberName = scanner.nextLine();
+                    System.out.print("Üye Tipi (1: Öğrenci, 2: Akademisyen): ");
+                    String memberType = scanner.nextLine();
+
+                    MemberRecord newMember;
+                    if (memberType.equals("2")) {
+                        newMember = new Faculty(newMemberId, newMemberName);
+                    } else {
+                        newMember = new Student(newMemberId, newMemberName);
+                    }
+                    service.addMember(newMember);
+                    break;
                 case 0:
                     System.out.println("Sistemden çıkılıyor. İyi günler!");
                     running = false;
@@ -110,5 +153,16 @@ public class Main {
             }
         }
         scanner.close();
+    }
+
+    private static double readDouble(Scanner scanner, String message) {
+        while (true) {
+            System.out.print(message);
+            try {
+                return Double.parseDouble(scanner.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.println("Lütfen geçerli bir sayı giriniz!");
+            }
+        }
     }
 }

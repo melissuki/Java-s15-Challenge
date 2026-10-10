@@ -4,19 +4,21 @@ import model.*;
 import repository.LibraryRepository;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
 public class LibraryService {
     private LibraryRepository repository;
-    private Map<String, Integer> memberBookCounts = new HashMap<>();
 
     public LibraryService(LibraryRepository repository) {
         this.repository = repository;
     }
 
     public void addBook(Book book) {
+        if (repository.getBookById(book.getBookId()) != null) {
+            System.out.println("Hata: " + book.getBookId() + " ID'li bir kitap zaten var!");
+            return;
+        }
         repository.addBook(book);
         System.out.println("Başarıyla eklendi: " + book.getName());
     }
@@ -33,12 +35,16 @@ public class LibraryService {
     }
 
     public void deleteBook(String bookId) {
-        if (repository.getBookById(bookId) != null) {
-            repository.removeBook(bookId);
-            System.out.println("Kitap sistemden silindi.");
-        } else {
+        if (repository.getBookById(bookId) == null) {
             System.out.println("Hata: Silinecek kitap bulunamadı!");
+            return;
         }
+        if (repository.getBorrowerId(bookId) != null) {
+            System.out.println("Hata: Bu kitap şu an ödünçte, iade edilmeden silinemez!");
+            return;
+        }
+        repository.removeBook(bookId);
+        System.out.println("Kitap sistemden silindi.");
     }
 
     public void listBooksByAuthor(String authorName) {
@@ -52,6 +58,36 @@ public class LibraryService {
         }
         if (!found) {
             System.out.println("Bu yazara ait kitap bulunamadı.");
+        }
+    }
+
+    public Category findOrCreateCategory(String categoryName) {
+        for (Category category : repository.getCategories()) {
+            if (category.getName().equalsIgnoreCase(categoryName)) {
+                return category;
+            }
+        }
+        return new Category("C-" + categoryName.toUpperCase(), categoryName);
+    }
+
+    public void listCategories() {
+        System.out.println("--- Kategoriler ---");
+        for (Category category : repository.getCategories()) {
+            System.out.println("- " + category.getName());
+        }
+    }
+
+    public void listBooksByCategory(String categoryName) {
+        System.out.println("--- Kategori: " + categoryName + " Kitapları ---");
+        boolean found = false;
+        for (Book book : repository.getAllBooks()) {
+            if (book.getCategory().getName().equalsIgnoreCase(categoryName)) {
+                book.display();
+                found = true;
+            }
+        }
+        if (!found) {
+            System.out.println("Bu kategoride kitap bulunamadı.");
         }
     }
 
@@ -83,8 +119,7 @@ public class LibraryService {
             return;
         }
 
-        int currentCount = memberBookCounts.getOrDefault(memberId, 0);
-        if (currentCount >= 5) {
+        if (!member.canBorrow()) {
             System.out.println("Hata: 5 kitap limitinize ulaştınız! Daha fazla kitap alamazsınız.");
             return;
         }
@@ -95,9 +130,10 @@ public class LibraryService {
         }
 
         book.setStatus(false);
-        memberBookCounts.put(memberId, currentCount + 1);
+        member.incBookIssued();
+        repository.addBorrowRecord(bookId, memberId);
 
-        String billId = "BİLL-" + UUID.randomUUID().toString().substring(0, 6).toUpperCase();
+        String billId = "BILL-" + UUID.randomUUID().toString().substring(0, 6).toUpperCase();
         Bill bill = new Bill(billId, member, book, book.getPrice(), "BORROW");
         repository.addBill(bill);
 
@@ -114,17 +150,51 @@ public class LibraryService {
             return;
         }
 
+        String borrowerId = repository.getBorrowerId(bookId);
+        if (borrowerId == null || !borrowerId.equals(memberId)) {
+            System.out.println("Hata: Bu kitap bu üyede değil, iade alınamaz!");
+            return;
+        }
+
         book.setStatus(true);
+        member.decBookIssued();
+        repository.removeBorrowRecord(bookId);
 
-        int currentCount = memberBookCounts.getOrDefault(memberId, 1);
-        memberBookCounts.put(memberId, currentCount - 1);
-
-        String billId = "BİLL-RET-" + UUID.randomUUID().toString().substring(0, 6).toUpperCase();
+        String billId = "BILL-RET-" + UUID.randomUUID().toString().substring(0, 6).toUpperCase();
         Bill bill = new Bill(billId, member, book, book.getPrice(), "RETURN");
         repository.addBill(bill);
 
         System.out.println("Kitap başarıyla iade alındı ve ücret iadesi yapıldı.");
         bill.printBill();
+    }
+
+    public void listBorrowedBooks() {
+        System.out.println("--- Ödünçteki Kitaplar ---");
+        if (repository.getBorrowedBooks().isEmpty()) {
+            System.out.println("Şu an ödünçte kitap yok.");
+            return;
+        }
+        for (Map.Entry<String, String> entry : repository.getBorrowedBooks().entrySet()) {
+            Book book = repository.getBookById(entry.getKey());
+            MemberRecord member = repository.getMemberById(entry.getValue());
+            System.out.println(book.getName() + " -> " + member.getName() + " (" + member.getMemberId() + ")");
+        }
+    }
+
+    public void listMembers() {
+        System.out.println("--- Üyeler ---");
+        for (MemberRecord member : repository.getAllMembers()) {
+            member.whoyouare();
+        }
+    }
+
+    public void addMember(MemberRecord member) {
+        if (repository.getMemberById(member.getMemberId()) != null) {
+            System.out.println("Hata: " + member.getMemberId() + " ID'li bir üye zaten var!");
+            return;
+        }
+        repository.addMember(member);
+        System.out.println("Üye başarıyla eklendi: " + member.getName());
     }
 
     public Collection<Book> getAllBooks() {

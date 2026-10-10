@@ -46,3 +46,7 @@ Bütün sistemi bir konsol uygulaması olarak dizayn etmelisiniz.(Scanner sını
 * Sistemden bir kitap alındığında kitabı alan kullanıcıya bir fatura kesilmelidir. Kitabı geri iade ettiğinde kullanıcıya ücreti geri iade edilmelidir.
 * Kullanıcıların 5 kitap limiti olmalı ve bu kitap limitine ulaştıklarında daha fazla kitap alamamalılar.  
  
+
+## UML Sınıf Diyagramı
+
+![UML Sınıf Diyagramı](uml.png)

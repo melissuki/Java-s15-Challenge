@@ -12,16 +12,25 @@ public class Category {
         return categoryId;
     }
 
-    public void setCategoryId(String categoryId) {
-        this.categoryId = categoryId;
-    }
-
     public String getName() {
         return name;
     }
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Category)) return false;
+        Category other = (Category) o;
+        return categoryId.equals(other.categoryId);
+    }
+
+    @Override
+    public int hashCode() {
+        return categoryId.hashCode();
     }
 
     @Override

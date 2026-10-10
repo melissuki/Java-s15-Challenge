@@ -55,7 +55,13 @@ public abstract class Book {
         this.price = price;
     }
 
+    public abstract String getType();
+
     public void display() {
-        System.out.println("Kitap: " + name + " | Yazar: " + author.getName() + " | Fiyat: " + price + " TL");
+        System.out.println("[" + getType() + "] " + bookId + " - " + name +
+                " | Yazar: " + author.getName() +
+                " | Kategori: " + category.getName() +
+                " | Fiyat: " + price + " TL" +
+                " | Durum: " + (status ? "Rafta" : "Ödünçte"));
     }
 }
