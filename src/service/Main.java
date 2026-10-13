@@ -67,17 +67,22 @@ public class Main {
                     System.out.print("Tür (1: Ders Kitabı, 2: Dergi, 3: Magazin): ");
                     String type = scanner.nextLine();
 
-                    Author newAuthor = new Author("A-" + UUID.randomUUID().toString().substring(0,4), aName);
-                    Category category = service.findOrCreateCategory(cName);
-                    Book newBook;
-                    if (type.equals("2")) {
-                        newBook = new Journals(bId, bName, newAuthor, category, price, 1);
-                    } else if (type.equals("3")) {
-                        newBook = new Magazines(bId, bName, newAuthor, category, price, 1);
-                    } else {
-                        newBook = new StudyBooks(bId, bName, newAuthor, category, price, 1);
+                    try {
+                        Author newAuthor = new Author("A-" + UUID.randomUUID().toString().substring(0, 4), aName);
+                        Category category = service.findOrCreateCategory(cName);
+                        Book newBook;
+                        if (type.equals("2")) {
+                            newBook = new Journals(bId, bName, newAuthor, category, price, 1);
+                        } else if (type.equals("3")) {
+                            newBook = new Magazines(bId, bName, newAuthor, category, price, 1);
+                        } else {
+                            newBook = new StudyBooks(bId, bName, newAuthor, category, price, 1);
+                        }
+                        service.addBook(newBook);
                     }
-                    service.addBook(newBook);
+                    catch (IllegalArgumentException e) {
+                        System.out.println("Hata: " + e.getMessage() + " Kitap eklenmedi.");
+                    }
                     break;
                 case 2:
                     System.out.print("Aranacak kelime (Tüm kitaplar için doğrudan Enter'a basın): ");

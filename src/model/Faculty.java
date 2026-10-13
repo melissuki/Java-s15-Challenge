@@ -6,7 +6,7 @@ public class Faculty extends MemberRecord{
     }
     @Override
     public void whoyouare() {
-        System.out.println("Ben bir akademisyen üyeyim, adım: " + name +
+        System.out.println("Ben bir akademisyen üyeyim, adım: " + getName() +
                 " | Üye ID: " + memberId + " | Ödünçteki kitap: " + noBooksIssued + "/" + maxBookLimit);
     }
 

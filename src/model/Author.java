@@ -22,12 +22,12 @@ public class Author extends Person {
     }
 
     public void showBook() {
-        System.out.println("Yazar: " + name + " - Kitap Sayısı: " + books.size());
+        System.out.println("Yazar: " + getName() + " - Kitap Sayısı: " + books.size());
     }
 
     @Override
     public void whoyouare() {
-        System.out.println("Ben bir Yazarım, adım: " + name);
+        System.out.println("Ben bir Yazarım, adım: " + getName());
     }
 
 

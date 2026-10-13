@@ -25,12 +25,16 @@ public class LibraryService {
 
     public void updateBook(String bookId, String newName, double newPrice) {
         Book book = repository.getBookById(bookId);
-        if (book != null) {
-            book.setName(newName);
+        if (book == null) {
+            System.out.println("Güncellenecek kitap bulunamadı.");
+            return;
+        }
+        try {
             book.setPrice(newPrice);
+            book.setName(newName);
             System.out.println("Kitap başarıyla güncellendi: " + newName);
-        } else {
-            System.out.println("Hata: Güncellenecek kitap bulunamadı!");
+        } catch (IllegalArgumentException e) {
+            System.out.println("Hata: " + e.getMessage());
         }
     }
 

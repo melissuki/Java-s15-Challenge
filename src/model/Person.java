@@ -1,16 +1,19 @@
 package model;
 
 public abstract class Person {
-    protected String name;
+    private String name;
 
     public Person(String name) {
-        this.name = name;
+        setName(name);
     }
     public String getName() {
         return name;
     }
 
     public void setName(String name) {
+        if (name == null || name.isBlank()) {
+            throw new IllegalArgumentException("Lütfen bir isim giriniz.");
+        }
         this.name = name;
     }
     public abstract void whoyouare();

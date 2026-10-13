@@ -19,7 +19,7 @@ public class Reader extends Person{
         if(book.isStatus() && books.size() < 5) {
             books.add(book);
             book.setStatus(false);
-            System.out.println(name + " adlı okuyucu '" + book.getName() + "' kitabını ödünç aldı.");
+            System.out.println(getName() + " adlı okuyucu '" + book.getName() + "' kitabını ödünç aldı.");
         }
         else {
             System.out.println("Kitap alınamadı! (Limit dolu veya kitap rafta değil)");
@@ -30,13 +30,13 @@ public class Reader extends Person{
         if(books.contains(book)) {
             books.remove(book);
             book.setStatus(true);
-            System.out.println(name + " adlı okuyucu '" + book.getName() + "' kitabını iade etti.");
+            System.out.println(getName() + " adlı okuyucu '" + book.getName() + "' kitabını iade etti.");
         }
     }
 
     @Override
     public void whoyouare() {
-        System.out.println("Ben bir Kütüphane Okuyucusuyum, adım: " + name);
+        System.out.println("Ben bir Kütüphane Okuyucusuyum, adım: " + getName());
     }
 
 

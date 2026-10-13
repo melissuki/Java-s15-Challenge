@@ -22,6 +22,6 @@ public class Librarian extends Person{
 
     @Override
     public void whoyouare() {
-        System.out.println("Ben Kütüphaneciyim, adım: " + name);
+        System.out.println("Ben Kütüphaneciyim, adım: " + getName());
     }
 }
