@@ -1,23 +1,17 @@
 package model;
 
 public class Librarian extends Person{
-    private String password;
+    private final String password;
 
     public Librarian(String name, String password) {
         super(name);
+        if (password == null || password.isBlank()) {
+            throw new IllegalArgumentException("Lütfen geçerli bir şifre giriniz.");
+        }
         this.password = password;
     }
-
-    public boolean verifyMember(MemberRecord member) {
-        return member != null;
-    }
-
-    public void issueBook(Reader reader, Book book) {
-        reader.borrowBook(book);
-    }
-
-    public void returnBook(Reader reader, Book book) {
-        reader.returnBook(book);
+    public boolean verifyPassword(String input) {
+        return password.equals(input);
     }
 
     @Override

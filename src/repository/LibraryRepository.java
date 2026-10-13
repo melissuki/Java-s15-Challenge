@@ -8,8 +8,8 @@ import java.util.*;
 
 public class LibraryRepository {
     private Map<String, Book> books = new HashMap<>();
-    private Map<String, MemberRecord> members = new HashMap<>();
-    private Map<String, String> borrowedBooks = new HashMap<>(); // kitapId -> üyeId
+    private Map<String, Reader> readers = new HashMap<>();
+    private Map<String, String> borrowedBooks = new HashMap<>(); //
     private Set<Category> categories = new HashSet<>();
     private List<Bill> bills = new ArrayList<>();
 
@@ -36,16 +36,16 @@ public class LibraryRepository {
 
     //burası üye işlemleri için
 
-    public void addMember(MemberRecord member) {
-        members.put(member.getMemberId(), member);
+    public void addReader(Reader reader) {
+        readers.put(reader.getMemberId(), reader);
     }
 
-    public MemberRecord getMemberById(String memberId) {
-        return members.get(memberId);
+    public Reader getReaderById(String memberId) {
+        return readers.get(memberId);
     }
 
-    public Collection<MemberRecord> getAllMembers() {
-        return Collections.unmodifiableCollection(members.values());
+    public Collection<Reader> getAllReaders() {
+        return Collections.unmodifiableCollection(readers.values());
     }
 
 

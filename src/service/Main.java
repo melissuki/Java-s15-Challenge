@@ -18,13 +18,13 @@ public class Main {
         Author author2 = new Author("A2", "Yoko Ogawa");
         Book book2 = new StudyBooks("B2", "Revenge", author2, cat1, 120.0, 1);
 
-        MemberRecord member = new Student("M1", "Melis");
-        MemberRecord member2 = new Faculty("M2", "Ayşe");
+        Reader reader1 = new Reader("M1", "Melis", MemberType.STUDENT);
+        Reader reader2 = new Reader("M2", "Ayşe", MemberType.FACULTY);
 
         repository.addBook(book1);
         repository.addBook(book2);
-        repository.addMember(member);
-        repository.addMember(member2);
+        repository.addReader(reader1);
+        repository.addReader(reader2);
 
         boolean running = true;
         while (running) {
@@ -131,7 +131,7 @@ public class Main {
                     service.listBorrowedBooks();
                     break;
                 case 10:
-                    service.listMembers();
+                    service.listReaders();
                     break;
                 case 11:
                     System.out.print("Üye ID (Örn: M3): ");
@@ -141,13 +141,12 @@ public class Main {
                     System.out.print("Üye Tipi (1: Öğrenci, 2: Akademisyen): ");
                     String memberType = scanner.nextLine();
 
-                    MemberRecord newMember;
-                    if (memberType.equals("2")) {
-                        newMember = new Faculty(newMemberId, newMemberName);
-                    } else {
-                        newMember = new Student(newMemberId, newMemberName);
+                    MemberType mType = memberType.equals("2") ? MemberType.FACULTY : MemberType.STUDENT;
+                    try {
+                        service.addReader(new Reader(newMemberId, newMemberName, mType));
+                    } catch (IllegalArgumentException e) {
+                        System.out.println("Hata: " + e.getMessage());
                     }
-                    service.addMember(newMember);
                     break;
                 case 0:
                     System.out.println("Sistemden çıkılıyor. İyi günler!");

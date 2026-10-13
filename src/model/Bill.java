@@ -3,16 +3,16 @@ package model;
 import java.time.LocalDate;
 
 public class Bill {
-    private String billId;
-    private MemberRecord member;
-    private Book book;
-    private double amount;
-    private LocalDate date;
-    private String transactionType;
+    private final String billId;
+    private final Reader reader;
+    private final Book book;
+    private final double amount;
+    private final LocalDate date;
+    private final String transactionType;
 
-    public Bill(String billId, MemberRecord member, Book book, double amount, String transactionType) {
+    public Bill(String billId, Reader reader, Book book, double amount, String transactionType) {
         this.billId = billId;
-        this.member = member;
+        this.reader = reader;
         this.book = book;
         this.amount = amount;
         this.date = LocalDate.now();
@@ -25,7 +25,7 @@ public class Bill {
         System.out.println("----------------------------------------");
         System.out.println("Fatura ID    : " + billId);
         System.out.println("İşlem Türü   : " + (transactionType.equals("BORROW") ? "Ödünç Alma" : "İade"));
-        System.out.println("Üye          : " + member.getName());
+        System.out.println("Üye          : " + reader.getName() + " (" + reader.getMemberId() + ")");
         System.out.println("Kitap        : " + book.getName());
         System.out.println("Tutar        : " + amount + " TL");
         System.out.println("Tarih        : " + date);

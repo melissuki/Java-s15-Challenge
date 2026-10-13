@@ -111,10 +111,10 @@ public class LibraryService {
     }
 
     public void borrowBook(String memberId, String bookId) {
-        MemberRecord member = repository.getMemberById(memberId);
+        Reader reader = repository.getReaderById(memberId);
         Book book = repository.getBookById(bookId);
 
-        if (member == null) {
+        if (reader == null) {
             System.out.println("Hata: Üye bulunamadı!");
             return;
         }
@@ -123,7 +123,7 @@ public class LibraryService {
             return;
         }
 
-        if (!member.canBorrow()) {
+        if (!reader.canBorrow()) {
             System.out.println("Hata: 5 kitap limitinize ulaştınız! Daha fazla kitap alamazsınız.");
             return;
         }
@@ -134,22 +134,21 @@ public class LibraryService {
         }
 
         book.setStatus(false);
-        member.incBookIssued();
+        reader.registerBorrow();
         repository.addBorrowRecord(bookId, memberId);
 
         String billId = "BILL-" + UUID.randomUUID().toString().substring(0, 6).toUpperCase();
-        Bill bill = new Bill(billId, member, book, book.getPrice(), "BORROW");
+        Bill bill = new Bill(billId, reader, book, book.getPrice(), "BORROW");
         repository.addBill(bill);
 
         System.out.println("Kitap başarıyla ödünç alındı!");
         bill.printBill();
     }
-
     public void returnBook(String memberId, String bookId) {
-        MemberRecord member = repository.getMemberById(memberId);
+        Reader reader = repository.getReaderById(memberId);
         Book book = repository.getBookById(bookId);
 
-        if (member == null || book == null) {
+        if (reader == null || book == null) {
             System.out.println("Hata: Üye veya kitap bulunamadı!");
             return;
         }
@@ -161,11 +160,11 @@ public class LibraryService {
         }
 
         book.setStatus(true);
-        member.decBookIssued();
+        reader.registerReturn();
         repository.removeBorrowRecord(bookId);
 
         String billId = "BILL-RET-" + UUID.randomUUID().toString().substring(0, 6).toUpperCase();
-        Bill bill = new Bill(billId, member, book, book.getPrice(), "RETURN");
+        Bill bill = new Bill(billId, reader, book, book.getPrice(), "RETURN");
         repository.addBill(bill);
 
         System.out.println("Kitap başarıyla iade alındı ve ücret iadesi yapıldı.");
@@ -180,25 +179,40 @@ public class LibraryService {
         }
         for (Map.Entry<String, String> entry : repository.getBorrowedBooks().entrySet()) {
             Book book = repository.getBookById(entry.getKey());
-            MemberRecord member = repository.getMemberById(entry.getValue());
-            System.out.println(book.getName() + " -> " + member.getName() + " (" + member.getMemberId() + ")");
+            Reader reader = repository.getReaderById(entry.getValue());
+            System.out.println(book.getName() + " -> " + reader.getName() + " (" + reader.getMemberId() + ")");
         }
     }
 
-    public void listMembers() {
-        System.out.println("--- Üyeler ---");
-        for (MemberRecord member : repository.getAllMembers()) {
-            member.whoyouare();
+    public void listReaders() {
+        System.out.println("--- Okuyucular ---");
+        for (Reader reader : repository.getAllReaders()) {
+            reader.whoyouare();
         }
     }
 
-    public void addMember(MemberRecord member) {
-        if (repository.getMemberById(member.getMemberId()) != null) {
-            System.out.println("Hata: " + member.getMemberId() + " ID'li bir üye zaten var!");
+    public void addReader(Reader reader) {
+        if (repository.getReaderById(reader.getMemberId()) != null) {
+            System.out.println("Hata: " + reader.getMemberId() + " ID'li bir üye zaten var!");
             return;
         }
-        repository.addMember(member);
-        System.out.println("Üye başarıyla eklendi: " + member.getName());
+        repository.addReader(reader);
+        System.out.println("Üye başarıyla eklendi: " + reader.getName());
+    }
+
+    public void listBooksOfReader(String memberId) {
+        System.out.println("--- Üzerimdeki Kitaplar ---");
+        boolean found = false;
+        for (Map.Entry<String, String> entry : repository.getBorrowedBooks().entrySet()) {
+            if (entry.getValue().equals(memberId)) {
+                Book book = repository.getBookById(entry.getKey());
+                book.display();
+                found = true;
+            }
+        }
+        if (!found) {
+            System.out.println("Üzerinizde ödünç kitap yok.");
+        }
     }
 
     public Collection<Book> getAllBooks() {

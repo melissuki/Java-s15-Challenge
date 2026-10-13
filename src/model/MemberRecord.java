@@ -1,12 +1,14 @@
 package model;
 
-public abstract class MemberRecord extends Person {
+public abstract class MemberRecord {
     private final String memberId;
     private int noBooksIssued;
     private static final int MAX_BOOK_LIMIT = 5;
 
-    public MemberRecord(String memberId, String name) {
-        super(name);
+    public MemberRecord(String memberId) {
+        if(memberId == null || memberId.isBlank()) {
+            throw new IllegalArgumentException("Üye ID boş olamaz.");
+        }
         this.memberId = memberId;
         this.noBooksIssued = 0;
     }
@@ -40,10 +42,9 @@ public abstract class MemberRecord extends Person {
         return MAX_BOOK_LIMIT;
     }
 
-    @Override
-    public void whoyouare() {
-        System.out.println("Ben bir " + getMemberType() + " üyeyim, adım: " + getName() +
-                " | Üye ID: " + memberId + " | Ödünçteki kitap: " + noBooksIssued + "/" + MAX_BOOK_LIMIT);
+    public String getSummary() {
+        return getMemberType() + " | Üye ID: " + memberId +
+                " | Ödünçteki kitap: " + noBooksIssued + "/" + MAX_BOOK_LIMIT;
     }
 
     public abstract String getMemberType();
