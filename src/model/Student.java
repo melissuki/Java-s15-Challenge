@@ -2,12 +2,12 @@ package model;
 
 public class Student extends MemberRecord{
     public Student(String memberId, String name) {
-        super(memberId, "Student", name);
+        super(memberId, name);
     }
+
     @Override
-    public void whoyouare() {
-        System.out.println("Ben bir öğrenci üyeyim, adım: " + getName() +
-                " | Üye ID: " + memberId + " | Ödünçteki kitap: " + noBooksIssued + "/" + maxBookLimit);
+    public String getMemberType() {
+        return "Öğrenci";
     }
 
 }
