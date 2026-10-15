@@ -218,6 +218,10 @@ public class LibraryService {
         System.out.println("Üye başarıyla eklendi: " + reader.getName());
     }
 
+    public Reader findReaderById(String memberId) {
+        return repository.getReaderById(memberId);
+    }
+
     public void listBooksOfReader(String memberId) {
         System.out.println("--- Üzerimdeki Kitaplar ---");
         boolean found = false;

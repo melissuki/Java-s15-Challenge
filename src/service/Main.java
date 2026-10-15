@@ -3,7 +3,6 @@ package service;
 import model.*;
 import repository.LibraryRepository;
 import java.util.Scanner;
-import java.util.UUID;
 
 public class Main {
     public static void main(String[] args) {
@@ -28,35 +27,85 @@ public class Main {
         repository.addReader(reader1);
         repository.addReader(reader2);
 
+        Librarian librarian = new Librarian("Admin", "1234");
+
         boolean running = true;
         while (running) {
             System.out.println("\n=== KÜTÜPHANE OTOMASYON SİSTEMİ ===");
+            System.out.println("1. Kütüphaneci Girişi");
+            System.out.println("2. Okuyucu Girişi");
+            System.out.println("0. Çıkış");
+            System.out.print("Seçiminiz: ");
+            String choice = scanner.nextLine();
+
+            switch (choice) {
+                case "1":
+                    if (librarianLogin(scanner, librarian)) {
+                        librarianMenu(scanner, service);
+                    }
+                    break;
+                case "2":
+                    Reader reader = readerLogin(scanner, service);
+                    if (reader != null) {
+                        readerMenu(scanner, service, reader);
+                    }
+                    break;
+                case "0":
+                    System.out.println("Sistemden çıkılıyor. İyi günler!");
+                    running = false;
+                    break;
+                default:
+                    System.out.println("Geçersiz seçim, lütfen menüdeki numaralardan birini giriniz.");
+            }
+        }
+        scanner.close();
+    }
+
+    private static boolean librarianLogin(Scanner scanner, Librarian librarian) {
+        for (int attempt = 1; attempt <= 3; attempt++) {
+            System.out.print("Şifre: ");
+            String input = scanner.nextLine();
+            if (librarian.verifyPassword(input)) {
+                librarian.whoyouare();
+                return true;
+            }
+            System.out.println("Hatalı şifre! Kalan hak: " + (3 - attempt));
+        }
+        System.out.println("Giriş başarısız. Ana menüye dönülüyor.");
+        return false;
+    }
+
+    private static Reader readerLogin(Scanner scanner, LibraryService service) {
+        System.out.print("Üye ID: ");
+        String memberId = scanner.nextLine();
+        Reader reader = service.findReaderById(memberId);
+        if (reader == null) {
+            System.out.println("Bu ID'ye sahip bir üye bulunamadı.");
+            return null;
+        }
+        reader.whoyouare();
+        return reader;
+    }
+
+    private static void librarianMenu(Scanner scanner, LibraryService service) {
+        boolean active = true;
+        while (active) {
+            System.out.println("\n--- KÜTÜPHANECİ MENÜSÜ ---");
             System.out.println("1. Yeni Kitap Ekle");
             System.out.println("2. Kitap Ara / Tümünü Listele");
             System.out.println("3. Kitap Güncelle");
             System.out.println("4. Kitap Sil");
-            System.out.println("5. Yazara Göre Kitapları Listele");
-            System.out.println("6. Kitap Ödünç Al");
-            System.out.println("7. Kitap İade Et");
-            System.out.println("8. Kategoriye Göre Kitapları Listele");
-            System.out.println("9. Ödünçteki Kitaplar (Kimde?)");
-            System.out.println("10. Üyeleri Listele");
-            System.out.println("11. Yeni Üye Ekle");
-            System.out.println("0. Çıkış");
+            System.out.println("5. Yazara Göre Listele");
+            System.out.println("6. Kategoriye Göre Listele");
+            System.out.println("7. Ödünçteki Kitaplar (Kimde?)");
+            System.out.println("8. Okuyucuları Listele");
+            System.out.println("9. Yeni Okuyucu Ekle");
+            System.out.println("0. Çıkış Yap");
             System.out.print("Seçiminiz: ");
-
-            String choiceStr = scanner.nextLine();
-            int choice = -1;
-
-            try {
-                choice = Integer.parseInt(choiceStr);
-            } catch (NumberFormatException e) {
-                System.out.println("Lütfen geçerli bir sayı giriniz!");
-                continue;
-            }
+            String choice = scanner.nextLine();
 
             switch (choice) {
-                case 1:
+                case "1":
                     System.out.print("Kitap ID: ");
                     String bId = scanner.nextLine();
                     System.out.print("Kitap Adı: ");
@@ -81,17 +130,16 @@ public class Main {
                             newBook = new StudyBooks(bId, bName, newAuthor, category, price, 1);
                         }
                         service.addBook(newBook);
-                    }
-                    catch (IllegalArgumentException e) {
+                    } catch (IllegalArgumentException e) {
                         System.out.println("Hata: " + e.getMessage() + " Kitap eklenmedi.");
                     }
                     break;
-                case 2:
+                case "2":
                     System.out.print("Aranacak kelime (Tüm kitaplar için doğrudan Enter'a basın): ");
                     String keyword = scanner.nextLine();
                     service.searchBooks(keyword);
                     break;
-                case 3:
+                case "3":
                     System.out.print("Güncellenecek Kitap ID (Örn: B1): ");
                     String uId = scanner.nextLine();
                     System.out.print("Yeni Kitap Adı: ");
@@ -99,43 +147,29 @@ public class Main {
                     double uPrice = readDouble(scanner, "Yeni Fiyat: ");
                     service.updateBook(uId, uName, uPrice);
                     break;
-                case 4:
+                case "4":
                     System.out.print("Silinecek Kitap ID: ");
                     String dId = scanner.nextLine();
                     service.deleteBook(dId);
                     break;
-                case 5:
+                case "5":
                     System.out.print("Yazar Adı (Örn: Haruki Murakami): ");
                     String authorName = scanner.nextLine();
                     service.listBooksByAuthor(authorName);
                     break;
-                case 6:
-                    System.out.print("Üye ID (Örn: M1): ");
-                    String mIdBorrow = scanner.nextLine();
-                    System.out.print("Kitap ID (Örn: B1): ");
-                    String bIdBorrow = scanner.nextLine();
-                    service.borrowBook(mIdBorrow, bIdBorrow);
-                    break;
-                case 7:
-                    System.out.print("Üye ID (Örn: M1): ");
-                    String mIdReturn = scanner.nextLine();
-                    System.out.print("Kitap ID (Örn: B1): ");
-                    String bIdReturn = scanner.nextLine();
-                    service.returnBook(mIdReturn, bIdReturn);
-                    break;
-                case 8:
+                case "6":
                     service.listCategories();
                     System.out.print("Kategori Adı (Örn: Roman): ");
                     String categoryName = scanner.nextLine();
                     service.listBooksByCategory(categoryName);
                     break;
-                case 9:
+                case "7":
                     service.listBorrowedBooks();
                     break;
-                case 10:
+                case "8":
                     service.listReaders();
                     break;
-                case 11:
+                case "9":
                     System.out.print("Üye ID (Örn: M3): ");
                     String newMemberId = scanner.nextLine();
                     System.out.print("Üye Adı: ");
@@ -150,15 +184,72 @@ public class Main {
                         System.out.println("Hata: " + e.getMessage());
                     }
                     break;
-                case 0:
-                    System.out.println("Sistemden çıkılıyor. İyi günler!");
-                    running = false;
+                case "0":
+                    System.out.println("Kütüphaneci oturumu kapatıldı.");
+                    active = false;
                     break;
                 default:
-                    System.out.println("Geçersiz seçim, lütfen menüdeki numaralardan birini giriniz.");
+                    System.out.println("Geçersiz seçim!");
             }
         }
-        scanner.close();
+    }
+
+    private static void readerMenu(Scanner scanner, LibraryService service, Reader reader) {
+        boolean active = true;
+        while (active) {
+            System.out.println("\n--- OKUYUCU MENÜSÜ (" + reader.getName() + ") ---");
+            System.out.println("1. Kitap Ara / Tümünü Listele");
+            System.out.println("2. Yazara Göre Listele");
+            System.out.println("3. Kategoriye Göre Listele");
+            System.out.println("4. Kitap Ödünç Al");
+            System.out.println("5. Kitap İade Et");
+            System.out.println("6. Üzerimdeki Kitaplar");
+            System.out.println("7. Profilim");
+            System.out.println("0. Çıkış Yap");
+            System.out.print("Seçiminiz: ");
+            String choice = scanner.nextLine();
+
+            switch (choice) {
+                case "1":
+                    System.out.print("Aranacak kelime (Tüm kitaplar için doğrudan Enter'a basın): ");
+                    String keyword = scanner.nextLine();
+                    service.searchBooks(keyword);
+                    break;
+                case "2":
+                    System.out.print("Yazar Adı (Örn: Haruki Murakami): ");
+                    String authorName = scanner.nextLine();
+                    service.listBooksByAuthor(authorName);
+                    break;
+                case "3":
+                    service.listCategories();
+                    System.out.print("Kategori Adı (Örn: Roman): ");
+                    String categoryName = scanner.nextLine();
+                    service.listBooksByCategory(categoryName);
+                    break;
+                case "4":
+                    System.out.print("Kitap ID: ");
+                    String borrowId = scanner.nextLine();
+                    service.borrowBook(reader.getMemberId(), borrowId);
+                    break;
+                case "5":
+                    System.out.print("Kitap ID: ");
+                    String returnId = scanner.nextLine();
+                    service.returnBook(reader.getMemberId(), returnId);
+                    break;
+                case "6":
+                    service.listBooksOfReader(reader.getMemberId());
+                    break;
+                case "7":
+                    reader.whoyouare();
+                    break;
+                case "0":
+                    System.out.println("Okuyucu oturumu kapatıldı.");
+                    active = false;
+                    break;
+                default:
+                    System.out.println("Geçersiz seçim!");
+            }
+        }
     }
 
     private static double readDouble(Scanner scanner, String message) {
