@@ -20,6 +20,7 @@ public class LibraryService {
             return;
         }
         repository.addBook(book);
+        book.getAuthor().newBook(book);
         System.out.println("Başarıyla eklendi: " + book.getName());
     }
 
@@ -47,6 +48,8 @@ public class LibraryService {
             System.out.println("Hata: Bu kitap şu an ödünçte, iade edilmeden silinemez!");
             return;
         }
+        Book book = repository.getBookById(bookId);
+        book.getAuthor().removeBook(book);
         repository.removeBook(bookId);
         System.out.println("Kitap sistemden silindi.");
     }
@@ -63,6 +66,12 @@ public class LibraryService {
         if (!found) {
             System.out.println("Bu yazara ait kitap bulunamadı.");
         }
+        for (Book book : repository.getAllBooks()) {
+            if(book.getAuthor().getName().equalsIgnoreCase(authorName)) {
+                book.getAuthor().showBook();
+                break;
+            }
+        }
     }
 
     public Category findOrCreateCategory(String categoryName) {
@@ -72,6 +81,15 @@ public class LibraryService {
             }
         }
         return new Category("C-" + categoryName.toUpperCase(), categoryName);
+    }
+
+    public Author findOrCreateAuthor(String authorName) {
+        for(Book book : repository.getAllBooks()) {
+            if(book.getAuthor().getName().equalsIgnoreCase(authorName)) {
+                return book.getAuthor();
+            }
+        }
+        return new Author("A-" + UUID.randomUUID().toString().substring(0, 4), authorName);
     }
 
     public void listCategories() {

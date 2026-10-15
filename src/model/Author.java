@@ -1,16 +1,17 @@
 package model;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Author extends Person {
-    private String authorId;
-    private List<Book> books;
+    private final String authorId;
+    private final Set<Book> books;
 
     public Author(String authorId, String name) {
         super(name);
         this.authorId = authorId;
-        this.books = new ArrayList<>();
+        this.books = new HashSet<>();
     }
 
     public String getAuthorId() {
@@ -19,6 +20,14 @@ public class Author extends Person {
 
     public void newBook(Book book) {
         books.add(book);
+    }
+
+    public void removeBook(Book book) {
+        books.remove(book);
+    }
+
+    public Set<Book> getBooks() {
+        return Collections.unmodifiableSet(books);
     }
 
     public void showBook() {

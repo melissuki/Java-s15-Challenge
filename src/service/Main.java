@@ -22,7 +22,9 @@ public class Main {
         Reader reader2 = new Reader("M2", "Ayşe", MemberType.FACULTY);
 
         repository.addBook(book1);
+        author1.newBook(book1);
         repository.addBook(book2);
+        author2.newBook(book2);
         repository.addReader(reader1);
         repository.addReader(reader2);
 
@@ -68,7 +70,7 @@ public class Main {
                     String type = scanner.nextLine();
 
                     try {
-                        Author newAuthor = new Author("A-" + UUID.randomUUID().toString().substring(0, 4), aName);
+                        Author newAuthor = service.findOrCreateAuthor(aName);
                         Category category = service.findOrCreateCategory(cName);
                         Book newBook;
                         if (type.equals("2")) {
